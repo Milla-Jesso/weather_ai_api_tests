@@ -1,0 +1,25 @@
+{
+  "name": "weather-ai-api-tests",
+  "version": "1.0.0",
+  "description": "API test automation suite for the WeatherAI developer platform, built with Playwright.",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed-report": "playwright test && playwright show-report",
+    "report": "playwright show-report"
+  },
+  "keywords": [
+    "testing",
+    "playwright",
+    "api",
+    "weather-ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
+    "dotenv": "^17.4.2",
+    "typescript": "^7.0.2"
+  }
+}
