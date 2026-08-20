@@ -20,13 +20,24 @@ You'll need your own API key from [weather-ai.co](https://weather-ai.co) — fre
 ## Running the tests
 
 ```bash
-npm test              # run the full suite, headless (list + HTML + JSON reporters)
-npm run report         # open the last HTML report
-npx playwright test tests/auth              # run one folder
+npm test                                     # run the full suite, headless (list + HTML + JSON reporters)
+npm run report                               # open the last HTML report
+npx playwright test tests/auth               # run one folder
 npx playwright test -g "out-of-range"        # run tests matching a name
+npx playwright test --grep "@smoke"          # run tests matching a tag
 ```
 
 The HTML report is written to `playwright-report/` and a JSON summary to `test-results/results.json`.
+
+### Test tags
+
+Test titles carry `@smoke`, `@error-handling`, or `@performance` tags (Playwright's `--grep` matches them as a substring against the full title):
+
+- **`@smoke`** — one fast happy-path check per endpoint group; "is the API up and returning the right shape"
+- **`@error-handling`** — every negative-path case: bad/missing auth, bad/missing params, unknown routes, plan-gated 403s
+- **`@performance`** — the response-time budget and consistency/concurrency checks
+
+Not every test carries a tag (boundary-value cases like poles/antimeridian, and the rate-limit-header discrepancy test, are intentionally untagged) — they still run under the full suite, just aren't selectable via a single tag. This is also what drives the CI manual-dispatch dropdown (see [CI](#ci)).
 
 ## Project structure
 
@@ -72,7 +83,12 @@ Everything under `src/` exists so that no test file has to know how to build a r
 
 ## CI
 
-`.github/workflows/tests.yml` runs the full suite on every push/PR to `main` and on manual dispatch, using a `WEATHER_AI_API_KEY` repository secret (never the plaintext key — see [Security note](#security-note)). It uploads the HTML report and JSON results as build artifacts and deploys the HTML report to GitHub Pages on pushes to `main`.
+`.github/workflows/tests.yml` runs on:
+- every push/PR to `main` (full suite)
+- a daily schedule (`06:00 UTC`), full suite, as a health check against the live API independent of code changes
+- manual dispatch (**Actions → API Tests → Run workflow**), where the person triggering it gets a `test_scope` dropdown — `all` / `smoke` / `error-handling` / `performance` — that greps on the matching tag (see [Test tags](#test-tags)); defaults to `all`
+
+All triggers use a `WEATHER_AI_API_KEY` repository secret (never the plaintext key — see [Security note](#security-note)). Every run — regardless of which trigger fired — uploads the HTML report and JSON results as build artifacts, so any reviewer can open the run in the Actions tab and download/view real results; pushes to `main` additionally deploy the HTML report to GitHub Pages for a live link.
 
 **One-time setup after forking/cloning this repo:**
 1. Repo **Settings → Secrets and variables → Actions** → add secret `WEATHER_AI_API_KEY`.

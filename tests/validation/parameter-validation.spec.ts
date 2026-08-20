@@ -2,19 +2,19 @@ import { test, expect } from '../../src/fixtures/api-fixtures';
 import { locations } from '../../src/data/test-locations';
 
 test.describe('Parameter validation & error handling', () => {
-  test('missing lat/lon returns 400 with a descriptive error', async ({ apiClient }) => {
+  test('missing lat/lon returns 400 with a descriptive error @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather');
     expect(response.status()).toBe(400);
     const body = await response.json();
     expect(body.error).toMatch(/lat|lon/i);
   });
 
-  test('non-numeric lat/lon returns 400', async ({ apiClient }) => {
+  test('non-numeric lat/lon returns 400 @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', { params: locations.nonNumeric });
     expect(response.status()).toBe(400);
   });
 
-  test('unknown route returns 404', async ({ apiClient }) => {
+  test('unknown route returns 404 @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/this-route-does-not-exist');
     expect(response.status()).toBe(404);
   });
@@ -29,12 +29,12 @@ test.describe('Parameter validation & error handling', () => {
    * so this test starts failing loudly — and gets noticed — if the
    * API's validation improves or regresses further.
    */
-  test('out-of-range latitude surfaces as a 502 (upstream failure), not a 400', async ({ apiClient }) => {
+  test('out-of-range latitude surfaces as a 502 (upstream failure), not a 400 @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', { params: locations.outOfRangeLat });
     expect(response.status()).toBe(502);
   });
 
-  test('out-of-range longitude surfaces as a 502 (upstream failure), not a 400', async ({ apiClient }) => {
+  test('out-of-range longitude surfaces as a 502 (upstream failure), not a 400 @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', { params: locations.outOfRangeLon });
     expect(response.status()).toBe(502);
   });

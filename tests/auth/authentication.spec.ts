@@ -8,12 +8,12 @@ import { locations } from '../../src/data/test-locations';
  * right layer to prove it works instead of retesting it N times.
  */
 test.describe('Authentication', () => {
-  test('valid API key succeeds', async ({ apiClient }) => {
+  test('valid API key succeeds @smoke', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', { params: locations.nairobi });
     expect(response.status()).toBe(200);
   });
 
-  test('missing Authorization header returns 401 with an error message', async ({ apiClient }) => {
+  test('missing Authorization header returns 401 with an error message @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', {
       params: locations.nairobi,
       authenticated: false,
@@ -23,7 +23,7 @@ test.describe('Authentication', () => {
     expect(body).toHaveProperty('error');
   });
 
-  test('garbage API key returns 401', async ({ apiClient }) => {
+  test('garbage API key returns 401 @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', {
       params: locations.nairobi,
       apiKeyOverride: 'wai_bogus_key_that_does_not_exist',
@@ -31,7 +31,7 @@ test.describe('Authentication', () => {
     expect(response.status()).toBe(401);
   });
 
-  test('empty bearer token returns 401', async ({ apiClient }) => {
+  test('empty bearer token returns 401 @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', {
       params: locations.nairobi,
       apiKeyOverride: '',
@@ -39,7 +39,7 @@ test.describe('Authentication', () => {
     expect(response.status()).toBe(401);
   });
 
-  test('non-Bearer auth scheme is rejected with 401', async ({ apiClient }) => {
+  test('non-Bearer auth scheme is rejected with 401 @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/weather', {
       params: locations.nairobi,
       authenticated: false,
@@ -48,7 +48,7 @@ test.describe('Authentication', () => {
     expect(response.status()).toBe(401);
   });
 
-  test('Pro-plan-only endpoint returns 403 on a free-tier key', async ({ apiClient }) => {
+  test('Pro-plan-only endpoint returns 403 on a free-tier key @error-handling', async ({ apiClient }) => {
     // This assumes the key under test is on the free plan (see .env).
     // On a Pro/Scale key this endpoint should instead return 200 —
     // flip the expectation if you run this suite with a higher-tier key.

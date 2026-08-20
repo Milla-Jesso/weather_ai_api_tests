@@ -5,7 +5,22 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # Daily health check against the live API, independent of code changes.
+    # Runs 06:00 UTC every day, only on the default branch.
+    - cron: '0 6 * * *'
   workflow_dispatch:
+    inputs:
+      test_scope:
+        description: 'Which tests to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - smoke
+          - error-handling
+          - performance
 
 permissions:
   contents: read
@@ -31,10 +46,21 @@ jobs:
         run: npm ci
 
       - name: Run API tests
-        run: npx playwright test
+        # test_scope only exists on workflow_dispatch; push/PR/schedule runs
+        # always get the empty default and fall through to the full suite.
+        # Values match the @smoke / @error-handling / @performance tags in
+        # test titles (see README "Test tags") — Playwright's --grep
+        # matches them as a substring/regex against the full test title.
+        run: |
+          if [ -n "$TEST_SCOPE" ] && [ "$TEST_SCOPE" != "all" ]; then
+            npx playwright test --grep "@$TEST_SCOPE"
+          else
+            npx playwright test
+          fi
         env:
           WEATHER_AI_BASE_URL: https://weather-ai.co
           WEATHER_AI_API_KEY: ${{ secrets.WEATHER_AI_API_KEY }}
+          TEST_SCOPE: ${{ inputs.test_scope }}
 
       - name: Upload HTML report
         if: always()

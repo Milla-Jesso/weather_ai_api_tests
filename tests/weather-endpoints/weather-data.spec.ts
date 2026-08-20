@@ -25,7 +25,7 @@ const weatherEndpoints = [
 
 for (const { path, requiresCoordinates } of weatherEndpoints) {
   test.describe(`GET ${path}`, () => {
-    test('returns 200 with a well-formed weather payload', async ({ apiClient }) => {
+    test('returns 200 with a well-formed weather payload @smoke', async ({ apiClient }) => {
       const response = await apiClient.get(path, {
         params: requiresCoordinates ? locations.nairobi : undefined,
       });
@@ -45,14 +45,14 @@ for (const { path, requiresCoordinates } of weatherEndpoints) {
     });
 
     if (requiresCoordinates) {
-      test('rejects a request missing lat/lon with 400', async ({ apiClient }) => {
+      test('rejects a request missing lat/lon with 400 @error-handling', async ({ apiClient }) => {
         const response = await apiClient.get(path);
         expect(response.status()).toBe(400);
         const body = await response.json();
         expect(body).toHaveProperty('error');
       });
 
-      test('rejects non-numeric coordinates with 400', async ({ apiClient }) => {
+      test('rejects non-numeric coordinates with 400 @error-handling', async ({ apiClient }) => {
         const response = await apiClient.get(path, { params: locations.nonNumeric });
         expect(response.status()).toBe(400);
       });
@@ -70,7 +70,7 @@ for (const { path, requiresCoordinates } of weatherEndpoints) {
       });
     }
 
-    test('rejects requests with no Authorization header', async ({ apiClient }) => {
+    test('rejects requests with no Authorization header @error-handling', async ({ apiClient }) => {
       const response = await apiClient.get(path, {
         params: requiresCoordinates ? locations.nairobi : undefined,
         authenticated: false,

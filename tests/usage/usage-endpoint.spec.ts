@@ -3,7 +3,7 @@ import { hasKeys } from '../../src/utils/schemas';
 import { expectJsonContentType } from '../../src/utils/assertions';
 
 test.describe('GET /v1/usage', () => {
-  test('returns plan quota fields', async ({ apiClient }) => {
+  test('returns plan quota fields @smoke', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/usage');
     expect(response.status()).toBe(200);
     expectJsonContentType(response);
@@ -17,7 +17,7 @@ test.describe('GET /v1/usage', () => {
     expect(body.used).toBeGreaterThanOrEqual(0);
   });
 
-  test('rejects unauthenticated requests', async ({ apiClient }) => {
+  test('rejects unauthenticated requests @error-handling', async ({ apiClient }) => {
     const response = await apiClient.get('/v1/usage', { authenticated: false });
     expect(response.status()).toBe(401);
   });
