@@ -2,7 +2,7 @@
 
 API test automation suite for the [WeatherAI](https://weather-ai.co/docs) developer platform, built with [Playwright](https://playwright.dev/docs/api-testing).
 
-**Live report:** _add your GitHub Pages URL here after the first push to `main`_
+**Live report:** [_add your GitHub Pages URL here after the first push to `main`_](https://milla-jesso.github.io/weather_ai_api_tests/)
 **CI runs:** see the [Actions tab](../../actions) of this repo
 
 ## Setup
